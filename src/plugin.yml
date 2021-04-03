@@ -4,6 +4,6 @@ main: me.szilprog.simplenpc.Main
 api-version: 1.16
 commands:
   reloadnpc:
-    description: Create NPC
+    description: Reload the plugin
     usage: /npcreload
     permission: npc.reload
