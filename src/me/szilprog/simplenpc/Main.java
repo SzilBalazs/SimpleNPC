@@ -22,6 +22,8 @@ public class Main extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        int pluginId = 10919;
+        Metrics metrics = new Metrics(this, pluginId);
         instance=this;
         try {
             ConfigManager.loadMainConfig();
