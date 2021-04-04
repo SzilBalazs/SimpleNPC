@@ -40,10 +40,12 @@ public class ConfigManager {
             c.addDefault("npc.loc.pitch", 0);
             c.addDefault("npc.command", "say hi {PlayerName}");
             c.addDefault("npc.cooldown", 3);
+            c.addDefault("npc.permission", "Disabled");
+            c.addDefault("npc.message", "&cYou don't have the permission to use this NPC!");
             c.options().copyDefaults(true);
             c.save(npcdata);
 
-            Main.instance.npcs.add(new NPC(new Location(Bukkit.getWorlds().get(0), c.getInt("npc.loc.x"), c.getInt("npc.loc.y"), c.getInt("npc.loc.z"), c.getInt("npc.loc.yaw"), c.getInt("npc.loc.pitch")), c.getString("npc.name"), c.getString("npc.skinname"), c.getString("npc.command"), c.getInt("npc.cooldown")));
+            Main.instance.npcs.add(new NPC(new Location(Bukkit.getWorlds().get(0), c.getInt("npc.loc.x"), c.getInt("npc.loc.y"), c.getInt("npc.loc.z"), c.getInt("npc.loc.yaw"), c.getInt("npc.loc.pitch")), c.getString("npc.name"), c.getString("npc.skinname"), c.getString("npc.command"), c.getInt("npc.cooldown"), c.getString("npc.permission"), c.getString("npc.message")));
         }
     }
 }

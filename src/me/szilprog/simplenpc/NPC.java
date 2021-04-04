@@ -34,14 +34,22 @@ public class NPC {
     private String command;
     private HashMap<UUID, Integer> cooldownManager= new HashMap<UUID, Integer>();
     private int cooldown;
+    private String permission;
+    private String permissionMessage;
     public static Plugin plugin;
 
-    public NPC(Location loc, String name, String skinUsername, String command, int cooldown) {
+    public NPC(Location loc, String name, String skinUsername, String command, int cooldown, String permission, String permissionMessage) {
         this.name = name;
         this.loc = loc;
         this.skin = skinUsername;
         this.command = command;
         this.cooldown = cooldown;
+        this.permission = permission;
+        this.permissionMessage = permissionMessage;
+        if (this.name.length() > 16) {
+            Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "INVALID NAME (LONGER THAN 16 CHARACTERS");
+            this.name = name.substring(0, 15);
+        }
 
         createNPC();
     }
@@ -121,6 +129,10 @@ public class NPC {
         new BukkitRunnable() {
             @Override
             public void run() {
+                if (!permission.equalsIgnoreCase("disabled") && !player.hasPermission(permission)) {
+                    player.sendMessage(coloredNameUtil(permissionMessage));
+                    return;
+                }
                 if (cooldownManager.containsKey(player.getUniqueId())) {
                     if (cooldownManager.get(player.getUniqueId()) > 0) {
                         return;
@@ -133,6 +145,7 @@ public class NPC {
                     cooldownManager.put(player.getUniqueId(), cooldown);
                 }
                 String formatedCmd = command.replace("{PlayerName}", player.getName());
+
                 Bukkit.dispatchCommand( Bukkit.getConsoleSender(), formatedCmd);
 
             }
