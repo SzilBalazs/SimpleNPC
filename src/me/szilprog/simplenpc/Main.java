@@ -43,6 +43,18 @@ public class Main extends JavaPlugin {
                 }
             }
         }.runTaskTimer(this, 0, 20);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (NPC npc : npcs) {
+                    if (npc.isLookClose()) {
+                        for (Player player : Bukkit.getOnlinePlayers()) {
+                            npc.sendLookPlayer(player);
+                        }
+                    }
+                }
+            }
+        }.runTaskTimer(this, 0, 2);
     }
 
     @Override

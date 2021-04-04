@@ -36,9 +36,11 @@ public class NPC {
     private int cooldown;
     private String permission;
     private String permissionMessage;
+    private boolean lookClose;
+    private int radius;
     public static Plugin plugin;
 
-    public NPC(Location loc, String name, String skinUsername, String command, int cooldown, String permission, String permissionMessage) {
+    public NPC(Location loc, String name, String skinUsername, String command, int cooldown, String permission, String permissionMessage, boolean lookClose, int radius) {
         this.name = name;
         this.loc = loc;
         this.skin = skinUsername;
@@ -46,6 +48,8 @@ public class NPC {
         this.cooldown = cooldown;
         this.permission = permission;
         this.permissionMessage = permissionMessage;
+        this.lookClose = lookClose;
+        this.radius = radius;
         if (this.name.length() > 16) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "INVALID NAME (LONGER THAN 16 CHARACTERS");
             this.name = name.substring(0, 15);
@@ -70,6 +74,14 @@ public class NPC {
         }
         npc = new EntityPlayer(nmsServer, nmsWorld, gameProfile, new PlayerInteractManager(nmsWorld));
         moveNPC(loc.getX(), loc.getY(), loc.getZ());
+    }
+
+    public void sendLookPlayer(Player player) {
+        if (player.getLocation().distance(loc) <= radius || radius == -1) {
+            Location loc = getEntityPlayer().getBukkitEntity().getLocation().setDirection(player.getLocation().toVector().subtract(getEntityPlayer().getBukkitEntity().getLocation().toVector()));
+            this.loc = loc;
+            lookNPCPacket(player, loc.getYaw(), loc.getPitch());
+        }
     }
 
     public static String coloredNameUtil(String str) {
@@ -164,4 +176,14 @@ public class NPC {
             }
         }
     }
+
+    public void lookNPCPacket(Player player, float yaw, float pitch) {
+        loc.setYaw(yaw);
+        loc.setPitch(pitch);
+        PlayerConnection connection = ((CraftPlayer)player).getHandle().playerConnection;
+        connection.sendPacket(new PacketPlayOutEntityHeadRotation(npc, (byte)(yaw * 256 / 360)));
+        connection.sendPacket(new PacketPlayOutEntity.PacketPlayOutEntityLook(npc.getId(), (byte)(yaw * 256 / 360), (byte)(pitch * 256 / 360), true));
+    }
+
+    public boolean isLookClose() { return lookClose; }
 }
