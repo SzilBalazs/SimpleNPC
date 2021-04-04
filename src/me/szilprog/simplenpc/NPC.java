@@ -138,28 +138,27 @@ public class NPC {
     }
 
     public void interactEvent(PacketPlayInUseEntity packet, Player player) throws ExecutionException, InterruptedException {
+        if (!permission.equalsIgnoreCase("disabled") && !player.hasPermission(permission)) {
+            player.sendMessage(coloredNameUtil(permissionMessage));
+            return;
+        }
+        if (cooldownManager.containsKey(player.getUniqueId())) {
+            if (cooldownManager.get(player.getUniqueId()) > 0) {
+                return;
+            }
+            else {
+                cooldownManager.replace(player.getUniqueId(), cooldown);
+            }
+        }
+        else {
+            cooldownManager.put(player.getUniqueId(), cooldown);
+        }
+        final String[] formatedCmd = {command.replace("{PlayerName}", player.getName())};
         new BukkitRunnable() {
+            private String cmd=formatedCmd[0];
             @Override
             public void run() {
-                if (!permission.equalsIgnoreCase("disabled") && !player.hasPermission(permission)) {
-                    player.sendMessage(coloredNameUtil(permissionMessage));
-                    return;
-                }
-                if (cooldownManager.containsKey(player.getUniqueId())) {
-                    if (cooldownManager.get(player.getUniqueId()) > 0) {
-                        return;
-                    }
-                    else {
-                        cooldownManager.replace(player.getUniqueId(), cooldown);
-                    }
-                }
-                else {
-                    cooldownManager.put(player.getUniqueId(), cooldown);
-                }
-                String formatedCmd = command.replace("{PlayerName}", player.getName());
-
-                Bukkit.dispatchCommand( Bukkit.getConsoleSender(), formatedCmd);
-
+                Bukkit.dispatchCommand( Bukkit.getConsoleSender(), cmd);
             }
         }.runTask(Main.instance);
 

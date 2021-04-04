@@ -73,7 +73,7 @@ public class ConfigManager {
             Bukkit.getConsoleSender().sendMessage("[Simple NPC] Invalid update check!");
         }
         if (versionNumber != null) {
-            if (Main.VERSION_NUMBER < versionNumber) {
+            if (Main.VERSION < versionNumber) {
                 Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Simple NPC] OUT-DATED!");
                 Main.instance.getLogger().info("Please visit https://www.spigotmc.org/resources/simple-npc-easily-create-clickable-npcs-permissions.90893/ to download the latest version.");
             }

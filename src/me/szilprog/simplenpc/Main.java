@@ -17,7 +17,7 @@ import java.util.List;
 
 public class Main extends JavaPlugin {
 
-    public static final int VERSION_NUMBER=1;
+    public static final int VERSION=2;
     public static Main instance;
     List<NPC> npcs = new ArrayList<>();
 
@@ -97,8 +97,8 @@ public class Main extends JavaPlugin {
             Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Simple NPC Reloaded!");
 
         }
-
-        // If the player (or console) uses our command correct, we can return true
+        else if (cmd.getLabel().equalsIgnoreCase("npc")) {
+        }
         return true;
     }
 }
