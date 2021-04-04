@@ -17,6 +17,7 @@ import java.util.List;
 
 public class Main extends JavaPlugin {
 
+    public static final int VERSION_NUMBER=1;
     public static Main instance;
     List<NPC> npcs = new ArrayList<>();
 
