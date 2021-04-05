@@ -38,9 +38,10 @@ public class NPC {
     private String permissionMessage;
     private boolean lookClose;
     private int radius;
+    private String npcid;
     public static Plugin plugin;
 
-    public NPC(Location loc, String name, String skinUsername, String command, int cooldown, String permission, String permissionMessage, boolean lookClose, int radius) {
+    public NPC(Location loc, String name, String skinUsername, String command, int cooldown, String permission, String permissionMessage, boolean lookClose, int radius, String npcid) {
         this.name = name;
         this.loc = loc;
         this.skin = skinUsername;
@@ -50,6 +51,7 @@ public class NPC {
         this.permissionMessage = permissionMessage;
         this.lookClose = lookClose;
         this.radius = radius;
+        this.npcid = npcid;
         if (this.name.length() > 16) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "INVALID NAME (LONGER THAN 16 CHARACTERS");
             this.name = name.substring(0, 15);
@@ -185,4 +187,8 @@ public class NPC {
     }
 
     public boolean isLookClose() { return lookClose; }
+
+    public String getName() { return name; }
+
+    public String getId() {return npcid; }
 }

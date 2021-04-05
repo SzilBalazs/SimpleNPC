@@ -5,5 +5,10 @@ api-version: 1.16
 commands:
   reloadnpc:
     description: Reload the plugin
-    usage: /npcreload
+    usage: /reloadnpc
     permission: npc.reload
+  npc:
+    description: Create/delete NPCs
+    usage: /npc create/delete
+    permission: npc.admin
+

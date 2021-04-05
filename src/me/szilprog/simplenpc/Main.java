@@ -98,7 +98,53 @@ public class Main extends JavaPlugin {
 
         }
         else if (cmd.getLabel().equalsIgnoreCase("npc")) {
+            if (args.length == 0) sender.sendMessage(ChatColor.RED + "Invalid usage: /npc create/delete/tphere {name}");
+            else if (sender.hasPermission("npc.admin")) {
+
+                if (args[0].equalsIgnoreCase("create") && args.length == 2) {
+                    try {
+                        if (sender instanceof Player) {
+                            ConfigManager.createNPC(args[1], ((Player) sender).getLocation());
+                            sendSuccesMessage(sender);
+                        }
+                        else {
+                            ConfigManager.createNPC(args[1]);
+                            sendSuccesMessage(sender);
+                        }
+
+                    } catch (IOException e) {
+                        getLogger().warning("Error Found");
+                    }
+                }
+                else if (args[0].equalsIgnoreCase("delete") && args.length == 2) {
+                    ConfigManager.deleteNPC(args[1]);
+                    sendSuccesMessage(sender);
+                }
+                else if (args[0].equalsIgnoreCase("tphere") && args.length == 2) {
+                    if (!(sender instanceof Player)) {
+                        sender.sendMessage(ChatColor.RED + "Only players can use this command!");
+                        return true;
+                    }
+                    for (NPC npc : npcs) {
+                        if (npc.getId().equalsIgnoreCase(args[1])) {
+                            Player p = (Player) sender;
+                            Location loc = p.getLocation();
+                            npc.moveNPC(loc.getX(), loc.getY(), loc.getZ());
+                            sendSuccesMessage(sender);
+                            return true;
+                        }
+                    }
+                    sender.sendMessage(ChatColor.RED + "NPC not found!");
+                }
+                else {
+                    sender.sendMessage(ChatColor.RED + "Invalid usage: /npc create/delete/tphere {name}");
+                }
+            }
         }
         return true;
+    }
+
+    public static void sendSuccesMessage(CommandSender sender) {
+        sender.sendMessage(ChatColor.GREEN + "Success");
     }
 }
