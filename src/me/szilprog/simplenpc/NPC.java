@@ -15,12 +15,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import javax.net.ssl.HttpsURLConnection;
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -38,7 +34,7 @@ public class NPC {
     private String permissionMessage;
     private boolean lookClose;
     private int radius;
-    private String npcid;
+    private final String npcId;
     public static Plugin plugin;
 
     public NPC(Location loc, String name, String skinUsername, String command, int cooldown, String permission, String permissionMessage, boolean lookClose, int radius, String npcid) {
@@ -51,7 +47,7 @@ public class NPC {
         this.permissionMessage = permissionMessage;
         this.lookClose = lookClose;
         this.radius = radius;
-        this.npcid = npcid;
+        this.npcId = npcid;
         if (this.name.length() > 16) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "INVALID NAME (LONGER THAN 16 CHARACTERS");
             this.name = name.substring(0, 15);
@@ -190,5 +186,5 @@ public class NPC {
 
     public String getName() { return name; }
 
-    public String getId() {return npcid; }
+    public String getId() {return npcId; }
 }

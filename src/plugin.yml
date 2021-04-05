@@ -1,14 +1,10 @@
 name: SimpleNPC
-version: 1.4.1
+version: 2.0
 main: me.szilprog.simplenpc.Main
 api-version: 1.16
 commands:
-  reloadnpc:
-    description: Reload the plugin
-    usage: /reloadnpc
-    permission: npc.reload
   npc:
-    description: Create/delete NPCs
-    usage: /npc create/delete
+    description: Create/delete/edit/reload NPCs
+    usage: /npc create/delete/edit/reload
     permission: npc.admin
 

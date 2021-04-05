@@ -9,6 +9,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -39,6 +41,55 @@ public class Listeners implements Listener {
             channel.pipeline().remove(player.getName());
             return null;
         });
+    }
+
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent event) {
+
+        if (!event.getInventory().equals(NPCEditGUI.inv)) return;
+        if (event.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.RED + "NPC Display Name")) {
+            event.getWhoClicked().closeInventory();
+            NPCEditGUI gui=NPCEditGUI.playerData.get((event.getWhoClicked().getUniqueId()));
+            gui.waitingMessage = WaitingMessageType.DISPLAY_NAME;
+            NPCEditGUI.playerData.replace(event.getWhoClicked().getUniqueId(), gui);
+        }
+        else if (event.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.RED + "NPC Skin Name")) {
+            event.getWhoClicked().closeInventory();
+            NPCEditGUI gui=NPCEditGUI.playerData.get((event.getWhoClicked().getUniqueId()));
+            gui.waitingMessage = WaitingMessageType.SKIN_NAME;
+            NPCEditGUI.playerData.replace(event.getWhoClicked().getUniqueId(), gui);
+        }
+        else if (event.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.RED + "NPC Command")) {
+            event.getWhoClicked().closeInventory();
+            NPCEditGUI gui=NPCEditGUI.playerData.get((event.getWhoClicked().getUniqueId()));
+            gui.waitingMessage = WaitingMessageType.COMMAND;
+            NPCEditGUI.playerData.replace(event.getWhoClicked().getUniqueId(), gui);
+        }
+        else if (event.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.RED + "NPC Cooldown")) {
+            event.getWhoClicked().closeInventory();
+            NPCEditGUI gui=NPCEditGUI.playerData.get((event.getWhoClicked().getUniqueId()));
+            gui.waitingMessage = WaitingMessageType.COOLDOWN;
+            NPCEditGUI.playerData.replace(event.getWhoClicked().getUniqueId(), gui);
+        }
+        event.getWhoClicked().sendMessage(ChatColor.GREEN + "Enter the value in chat! (Enter cancel if you want to cancel it.)");
+        event.setCancelled(true);
+
+    }
+
+    @EventHandler
+    public void chatEvent(AsyncPlayerChatEvent event) {
+        NPCEditGUI gui=NPCEditGUI.playerData.get((event.getPlayer().getUniqueId()));
+        if (gui == null) return;
+        if (gui.waitingMessage == WaitingMessageType.NONE) return;
+        if (event.getMessage().equalsIgnoreCase("cancel")) {
+            gui.waitingMessage = WaitingMessageType.NONE;
+            NPCEditGUI.playerData.replace(event.getPlayer().getUniqueId(), gui);
+            gui.openGUI();
+            event.setCancelled(true);
+            return;
+        }
+        gui.messageEvent(event.getMessage());
+        event.setCancelled(true);
     }
 
     private void injectPlayer(Player player) {

@@ -17,7 +17,7 @@ import java.util.List;
 
 public class Main extends JavaPlugin {
 
-    public static final int VERSION=4;
+    public static final int VERSION=5;
     public static Main instance;
     List<NPC> npcs = new ArrayList<>();
 
@@ -32,6 +32,7 @@ public class Main extends JavaPlugin {
             e.printStackTrace();
         }
         Bukkit.getPluginManager().registerEvents(new Listeners(), this);
+        Bukkit.getPluginManager().registerEvents(new NPCEditGUI(), this);
         Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Simple NPC Enabled!");
         for (Player p : Bukkit.getOnlinePlayers()) {
             for (NPC npc : npcs) {
@@ -72,33 +73,8 @@ public class Main extends JavaPlugin {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-
-        if (cmd.getLabel().equalsIgnoreCase("reloadnpc")) {
-            if (!sender.hasPermission("npc.reload")) {
-                sender.sendMessage(ChatColor.RED + "You don't have the permission to use this command!");
-                return false;
-            }
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                for (NPC npc : npcs) {
-                    npc.removeNPCPacket(p);
-                }
-            }
-            npcs.clear();
-            try {
-                ConfigManager.loadMainConfig();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                for (NPC npc : npcs) {
-                    npc.addNPCPacket(p);
-                }
-            }
-            Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Simple NPC Reloaded!");
-
-        }
-        else if (cmd.getLabel().equalsIgnoreCase("npc")) {
-            if (args.length == 0) sender.sendMessage(ChatColor.RED + "Invalid usage: /npc create/delete/tphere {name}");
+        if (cmd.getLabel().equalsIgnoreCase("npc")) {
+            if (args.length == 0) sender.sendMessage(ChatColor.RED + "Invalid usage: /npc create/delete/edit/reload {name}");
             else if (sender.hasPermission("npc.admin")) {
 
                 if (args[0].equalsIgnoreCase("create") && args.length == 2) {
@@ -120,24 +96,40 @@ public class Main extends JavaPlugin {
                     ConfigManager.deleteNPC(args[1]);
                     sendSuccesMessage(sender);
                 }
-                else if (args[0].equalsIgnoreCase("tphere") && args.length == 2) {
-                    if (!(sender instanceof Player)) {
-                        sender.sendMessage(ChatColor.RED + "Only players can use this command!");
-                        return true;
+                else if (args[0].equalsIgnoreCase("edit") && args.length == 2) {
+                    if (sender instanceof Player) {
+                        for (NPC npc : npcs) {
+                            if (npc.getId().equalsIgnoreCase(args[1])) {
+                                npc.sendAnimatonPacket(0);
+                                NPCEditGUI gui = new NPCEditGUI((Player) sender, npc);
+                                return true;
+                            }
+                        }
+                        sender.sendMessage(ChatColor.RED + "NPC not found!");
                     }
-                    for (NPC npc : npcs) {
-                        if (npc.getId().equalsIgnoreCase(args[1])) {
-                            Player p = (Player) sender;
-                            Location loc = p.getLocation();
-                            npc.moveNPC(loc.getX(), loc.getY(), loc.getZ());
-                            sendSuccesMessage(sender);
-                            return true;
+
+                }
+                else if (args[0].equalsIgnoreCase("reload")) {
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        for (NPC npc : npcs) {
+                            npc.removeNPCPacket(p);
                         }
                     }
-                    sender.sendMessage(ChatColor.RED + "NPC not found!");
+                    npcs.clear();
+                    try {
+                        ConfigManager.loadMainConfig();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        for (NPC npc : npcs) {
+                            npc.addNPCPacket(p);
+                        }
+                    }
+                    Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Simple NPC Reloaded!");
                 }
                 else {
-                    sender.sendMessage(ChatColor.RED + "Invalid usage: /npc create/delete/tphere {name}");
+                    sender.sendMessage(ChatColor.RED + "Invalid usage: /npc create/delete/edit/reload {name}");
                 }
             }
         }
