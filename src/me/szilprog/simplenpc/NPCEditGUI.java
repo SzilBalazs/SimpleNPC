@@ -4,11 +4,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -19,10 +19,10 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class NPCEditGUI implements Listener {
-    public static Inventory inv;
+    public Inventory inv;
     public NPC npc;
     public Player player;
-    public static FileConfiguration config;
+    public FileConfiguration config;
     public static HashMap<UUID, NPCEditGUI> playerData = new HashMap<UUID, NPCEditGUI>();
     public WaitingMessageType waitingMessage=WaitingMessageType.NONE;
 
@@ -31,19 +31,15 @@ public class NPCEditGUI implements Listener {
         this.player = player;
         if (!playerData.containsKey(player.getUniqueId())) playerData.put(player.getUniqueId(), this);
         else playerData.replace(player.getUniqueId(), this);
-        if (config == null) config = ConfigManager.getNPCConfig(npc.getId());
-        if (inv == null) createInventory();
+        config = ConfigManager.getNPCConfig(npc.getId());
+        createInventory();
         player.openInventory(inv);
 
     }
 
-    public NPCEditGUI() {
-        // LISTENER CONSTRUCTOR
-    }
-
     public Inventory getInventory() { return inv; }
 
-    public static ItemStack getItem(int index) {
+    public ItemStack getItem(int index) {
         ItemStack itemStack=null;
         switch (index) {
             case 0:
@@ -74,24 +70,57 @@ public class NPCEditGUI implements Listener {
                 meta.setLore(Arrays.asList(ChatColor.GRAY + "Click here to edit the NPC's cooldown!", ChatColor.GRAY + "How many seconds the player have to", ChatColor.GRAY + "wait until the running the command again.", ChatColor.GRAY + "At least 1 is recommended to prevent spamming.", ChatColor.GREEN + "Current is " + config.getString("npc.cooldown")));
                 itemStack.setItemMeta(meta);
                 break;
+            case 4:
+                itemStack = new ItemStack(Material.PAPER);
+                meta = itemStack.getItemMeta();
+                meta.setDisplayName(ChatColor.RED + "NPC Permission");
+                meta.setLore(Arrays.asList(ChatColor.GRAY + "Click here to edit the NPC's permission!", ChatColor.GRAY + "Right click to " + ChatColor.RED + "disable " + ChatColor.GRAY +  "this feature", ChatColor.GRAY + "Permission needed to use the NPC.", ChatColor.GREEN + "Current is " + config.getString("npc.permission.permission")));
+                itemStack.setItemMeta(meta);
+                break;
+            case 5:
+                itemStack = new ItemStack(Material.PAPER);
+                meta = itemStack.getItemMeta();
+                meta.setDisplayName(ChatColor.RED + "NPC Permission Message");
+                meta.setLore(Arrays.asList(ChatColor.GRAY + "Click here to edit the NPC's permission message!", ChatColor.GRAY + "The permission message.", ChatColor.GREEN + "Current is " + config.getString("npc.permission.message")));
+                itemStack.setItemMeta(meta);
+                break;
+            case 6:
+                itemStack = new ItemStack(Material.PAPER);
+                if (config.getBoolean("npc.look.lookPlayer")) {
+                    itemStack.addUnsafeEnchantment(Enchantment.DURABILITY, 1);
+                }
+                meta = itemStack.getItemMeta();
+                meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+
+                meta.setDisplayName(ChatColor.RED + "NPC Look Player");
+                meta.setLore(Arrays.asList(ChatColor.GRAY + "Click here to set the NPC's look player value to " + !config.getBoolean("npc.look.lookPlayer") +  "!", ChatColor.GRAY + "This will make the NPC always look the player."));
+                itemStack.setItemMeta(meta);
+                break;
         }
         return itemStack;
     }
 
     public void createInventory() {
-        inv=Bukkit.createInventory(null, 9, ChatColor.DARK_GREEN + "Editing " + npc.getId());
-        for (int i=0;i<9;i++) {
-            ItemStack itemStack = getItem(i);
+        inv=Bukkit.createInventory(null, 27, ChatColor.DARK_GREEN + "Editing " + npc.getId());
+        for (int i=10;i<19;i++) {
+            ItemStack itemStack = getItem(i-10);
             if (itemStack != null) {
                 inv.setItem(i, itemStack);
             }
         }
+        ItemStack itemStack = new ItemStack(Material.GREEN_CONCRETE);
+        ItemMeta meta = itemStack.getItemMeta();
+        meta.setDisplayName(ChatColor.RED + "Reload NPCs");
+        meta.setLore(Arrays.asList(ChatColor.GRAY + "Click here to reload NPCs!"));
+        itemStack.setItemMeta(meta);
+        inv.setItem(26, itemStack);
     }
 
     public void openGUI() {
         new BukkitRunnable() {
             @Override
             public void run() {
+                createInventory();
                 player.openInventory(inv);
             }
         }.runTask(Main.instance);
@@ -117,16 +146,22 @@ public class NPCEditGUI implements Listener {
                         break;
                     case COOLDOWN:
                         try {
-                            config.set("npc.cooldown", String.valueOf(message));
+                            config.set("npc.cooldown", Integer.parseInt(message));
                         }
                         catch (Exception e) {
                             player.sendMessage(ChatColor.RED + "Please enter a valid number!");
                         }
                         break;
+                    case PERMISSION:
+                        config.set("npc.permission.permission", message);
+                        break;
+                    case PMESSAGE:
+                        config.set("npc.permission.message", message);
+                        break;
 
                 }
-                createInventory();
-                player.openInventory(inv);
+                openGUI();
+
                 try {
                     config.save(ConfigManager.getConfigFile(npc.getId()));
                 } catch (IOException e) {

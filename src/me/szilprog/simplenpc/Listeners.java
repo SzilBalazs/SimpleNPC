@@ -4,6 +4,8 @@ import io.netty.channel.*;
 import net.minecraft.server.v1_16_R3.PacketPlayInUseEntity;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,6 +16,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 
 
@@ -46,7 +49,8 @@ public class Listeners implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
 
-        if (!event.getInventory().equals(NPCEditGUI.inv)) return;
+        if (!event.getInventory().equals(NPCEditGUI.playerData.get(event.getWhoClicked().getUniqueId()).getInventory())) return;
+        if (event.getCurrentItem() == null) return;
         if (event.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.RED + "NPC Display Name")) {
             event.getWhoClicked().closeInventory();
             NPCEditGUI gui=NPCEditGUI.playerData.get((event.getWhoClicked().getUniqueId()));
@@ -70,6 +74,71 @@ public class Listeners implements Listener {
             NPCEditGUI gui=NPCEditGUI.playerData.get((event.getWhoClicked().getUniqueId()));
             gui.waitingMessage = WaitingMessageType.COOLDOWN;
             NPCEditGUI.playerData.replace(event.getWhoClicked().getUniqueId(), gui);
+        }
+        else if (event.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.RED + "NPC Permission")) {
+            if (event.isRightClick()) {
+                NPCEditGUI gui=NPCEditGUI.playerData.get((event.getWhoClicked().getUniqueId()));
+                gui.config.set("npc.permission.permission", "Disabled");
+                try {
+                    gui.config.save(ConfigManager.getConfigFile(gui.npc.getId()));
+                } catch (IOException e) {
+
+                }
+                NPCEditGUI.playerData.replace(event.getWhoClicked().getUniqueId(), gui);
+                gui.openGUI();
+                event.setCancelled(true);
+                return;
+            }
+            event.getWhoClicked().closeInventory();
+            NPCEditGUI gui=NPCEditGUI.playerData.get((event.getWhoClicked().getUniqueId()));
+            gui.waitingMessage = WaitingMessageType.PERMISSION;
+            NPCEditGUI.playerData.replace(event.getWhoClicked().getUniqueId(), gui);
+        }
+        else if (event.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.RED + "NPC Permission Message")) {
+            event.getWhoClicked().closeInventory();
+            NPCEditGUI gui=NPCEditGUI.playerData.get((event.getWhoClicked().getUniqueId()));
+            gui.waitingMessage = WaitingMessageType.PMESSAGE;
+            NPCEditGUI.playerData.replace(event.getWhoClicked().getUniqueId(), gui);
+        }
+        else if (event.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.RED + "NPC Look Player")) {
+            NPCEditGUI gui=NPCEditGUI.playerData.get((event.getWhoClicked().getUniqueId()));
+            gui.config.set("npc.look.lookPlayer", !gui.config.getBoolean("npc.look.lookPlayer"));
+            try {
+                gui.config.save(ConfigManager.getConfigFile(gui.npc.getId()));
+            } catch (IOException e) {
+
+            }
+            NPCEditGUI.playerData.replace(event.getWhoClicked().getUniqueId(), gui);
+            gui.openGUI();
+            event.setCancelled(true);
+            return;
+        }
+        else if (event.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.RED + "Reload NPCs")) {
+            event.setCancelled(true);
+            NPCEditGUI gui=NPCEditGUI.playerData.get((event.getWhoClicked().getUniqueId()));
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                gui.npc.removeNPCPacket(p);
+            }
+
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                for (NPC npc : Main.instance.npcs) {
+                    npc.removeNPCPacket(p);
+                }
+            }
+            Main.instance.npcs.clear();
+            try {
+                ConfigManager.loadMainConfig();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                for (NPC npc : Main.instance.npcs) {
+                    npc.addNPCPacket(p);
+                }
+            }
+            Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Simple NPC Reloaded!");
+            event.getWhoClicked().sendMessage(ChatColor.YELLOW + "You have to relog to use the command system");
+            return;
         }
         event.getWhoClicked().sendMessage(ChatColor.GREEN + "Enter the value in chat! (Enter cancel if you want to cancel it.)");
         event.setCancelled(true);

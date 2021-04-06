@@ -26,7 +26,7 @@ public class ConfigManager {
             configFile=new File(Main.instance.getDataFolder(), "npc.yml");
         }
         configuration=YamlConfiguration.loadConfiguration(configFile);
-        configuration.addDefault("npc.names", Arrays.asList("examplenpc"));
+        configuration.addDefault("npc.names", Arrays.asList());
         configuration.options().copyDefaults(true);
         configuration.save(configFile);
         List<String> names = configuration.getStringList("npc.names");
@@ -141,7 +141,7 @@ public class ConfigManager {
     public static void deleteNPC(String name) {
         Main.instance.getLogger().info("Deleting {name} npc.".replace("{name}", name));
         File npcdata = new File(Main.instance.getDataFolder(), name+".yml");
-        npcdata.delete();
+
         try {
             List<String> list = configuration.getStringList("npc.names");
             list.remove(name);
@@ -151,6 +151,7 @@ public class ConfigManager {
         catch (Exception e) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "NPC Name not found!");
         }
+        npcdata.delete();
     }
 
 

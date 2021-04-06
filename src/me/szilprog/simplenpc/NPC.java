@@ -136,10 +136,7 @@ public class NPC {
     }
 
     public void interactEvent(PacketPlayInUseEntity packet, Player player) throws ExecutionException, InterruptedException {
-        if (!permission.equalsIgnoreCase("disabled") && !player.hasPermission(permission)) {
-            player.sendMessage(coloredNameUtil(permissionMessage));
-            return;
-        }
+
         if (cooldownManager.containsKey(player.getUniqueId())) {
             if (cooldownManager.get(player.getUniqueId()) > 0) {
                 return;
@@ -150,6 +147,10 @@ public class NPC {
         }
         else {
             cooldownManager.put(player.getUniqueId(), cooldown);
+        }
+        if (!permission.equalsIgnoreCase("disabled") && !player.hasPermission(permission)) {
+            player.sendMessage(coloredNameUtil(permissionMessage));
+            return;
         }
         final String[] formatedCmd = {command.replace("{PlayerName}", player.getName())};
         new BukkitRunnable() {

@@ -17,7 +17,7 @@ import java.util.List;
 
 public class Main extends JavaPlugin {
 
-    public static final int VERSION=5;
+    public static final int VERSION=6;
     public static Main instance;
     List<NPC> npcs = new ArrayList<>();
 
@@ -25,14 +25,13 @@ public class Main extends JavaPlugin {
     public void onEnable() {
         int pluginId = 10919;
         Metrics metrics = new Metrics(this, pluginId);
-        instance=this;
+        if (instance == null) instance=this;
         try {
             ConfigManager.loadMainConfig();
         } catch (IOException e) {
             e.printStackTrace();
         }
         Bukkit.getPluginManager().registerEvents(new Listeners(), this);
-        Bukkit.getPluginManager().registerEvents(new NPCEditGUI(), this);
         Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Simple NPC Enabled!");
         for (Player p : Bukkit.getOnlinePlayers()) {
             for (NPC npc : npcs) {
@@ -127,6 +126,7 @@ public class Main extends JavaPlugin {
                         }
                     }
                     Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Simple NPC Reloaded!");
+                    sender.sendMessage(ChatColor.YELLOW + "You have to relog to use the command system");
                 }
                 else {
                     sender.sendMessage(ChatColor.RED + "Invalid usage: /npc create/delete/edit/reload {name}");
