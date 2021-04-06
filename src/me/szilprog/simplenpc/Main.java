@@ -79,20 +79,19 @@ public class Main extends JavaPlugin {
                 if (args[0].equalsIgnoreCase("create") && args.length == 2) {
                     try {
                         if (sender instanceof Player) {
-                            ConfigManager.createNPC(args[1], ((Player) sender).getLocation());
-                            sendSuccesMessage(sender);
+                            ConfigManager.createNPC(args[1].toLowerCase(), ((Player) sender).getLocation());
                         }
                         else {
-                            ConfigManager.createNPC(args[1]);
-                            sendSuccesMessage(sender);
+                            ConfigManager.createNPC(args[1].toLowerCase());
                         }
+                        sendSuccesMessage(sender);
 
                     } catch (IOException e) {
                         getLogger().warning("Error Found");
                     }
                 }
                 else if (args[0].equalsIgnoreCase("delete") && args.length == 2) {
-                    ConfigManager.deleteNPC(args[1]);
+                    ConfigManager.deleteNPC(args[1].toLowerCase());
                     sendSuccesMessage(sender);
                 }
                 else if (args[0].equalsIgnoreCase("edit") && args.length == 2) {
@@ -126,7 +125,6 @@ public class Main extends JavaPlugin {
                         }
                     }
                     Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Simple NPC Reloaded!");
-                    sender.sendMessage(ChatColor.YELLOW + "You have to relog to use the command system");
                 }
                 else {
                     sender.sendMessage(ChatColor.RED + "Invalid usage: /npc create/delete/edit/reload {name}");

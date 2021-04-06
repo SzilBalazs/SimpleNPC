@@ -108,8 +108,14 @@ public class NPCEditGUI implements Listener {
                 inv.setItem(i, itemStack);
             }
         }
-        ItemStack itemStack = new ItemStack(Material.GREEN_CONCRETE);
+        ItemStack itemStack = new ItemStack(Material.RED_CONCRETE);
         ItemMeta meta = itemStack.getItemMeta();
+        meta.setDisplayName(ChatColor.RED + "Delete NPC");
+        meta.setLore(Arrays.asList(ChatColor.GRAY + "Click here to delete this NPC!"));
+        itemStack.setItemMeta(meta);
+        inv.setItem(25, itemStack);
+        itemStack = new ItemStack(Material.GREEN_CONCRETE);
+        meta = itemStack.getItemMeta();
         meta.setDisplayName(ChatColor.RED + "Reload NPCs");
         meta.setLore(Arrays.asList(ChatColor.GRAY + "Click here to reload NPCs!"));
         itemStack.setItemMeta(meta);

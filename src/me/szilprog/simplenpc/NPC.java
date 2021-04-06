@@ -8,6 +8,7 @@ import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
@@ -58,7 +59,7 @@ public class NPC {
 
     public void createNPC() {
         MinecraftServer nmsServer = ((CraftServer) Bukkit.getServer()).getServer();
-        WorldServer nmsWorld = ((CraftWorld)Bukkit.getWorld("world")).getHandle();
+        WorldServer nmsWorld = ((CraftWorld)loc.getWorld()).getHandle();
         GameProfile gameProfile = new GameProfile(UUID.randomUUID(), coloredNameUtil(name));
         String[] name=null;
         try {
@@ -75,9 +76,9 @@ public class NPC {
     }
 
     public void sendLookPlayer(Player player) {
+        if (!loc.getWorld().toString().equals(player.getLocation().getWorld().toString())) return;
         if (player.getLocation().distance(loc) <= radius || radius == -1) {
             Location loc = getEntityPlayer().getBukkitEntity().getLocation().setDirection(player.getLocation().toVector().subtract(getEntityPlayer().getBukkitEntity().getLocation().toVector()));
-            this.loc = loc;
             lookNPCPacket(player, loc.getYaw(), loc.getPitch());
         }
     }
@@ -122,7 +123,6 @@ public class NPC {
         npc.setLocation(x, y, z, loc.getYaw(), loc.getPitch());
         loc = new Location(loc.getWorld(), x, y, z, loc.getYaw(), loc.getPitch());
         for (Player p : Bukkit.getOnlinePlayers()) {
-
             ((CraftPlayer)p).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityTeleport(npc));
         }
     }

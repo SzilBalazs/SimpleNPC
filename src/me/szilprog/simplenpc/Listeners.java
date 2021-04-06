@@ -13,8 +13,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -49,6 +51,7 @@ public class Listeners implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
 
+        if (NPCEditGUI.playerData.get(event.getWhoClicked().getUniqueId()) == null) return;
         if (!event.getInventory().equals(NPCEditGUI.playerData.get(event.getWhoClicked().getUniqueId()).getInventory())) return;
         if (event.getCurrentItem() == null) return;
         if (event.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.RED + "NPC Display Name")) {
@@ -137,7 +140,18 @@ public class Listeners implements Listener {
                 }
             }
             Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Simple NPC Reloaded!");
-            event.getWhoClicked().sendMessage(ChatColor.YELLOW + "You have to relog to use the command system");
+            return;
+        }
+        else if (event.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.RED + "Delete NPC")) {
+            event.getWhoClicked().closeInventory();
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "npc delete {0}".replace("{0}", NPCEditGUI.playerData.get((event.getWhoClicked().getUniqueId())).npc.getId()));
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "npc reload");
+                }
+            }.runTask(Main.instance);
+            event.setCancelled(true);
             return;
         }
         event.getWhoClicked().sendMessage(ChatColor.GREEN + "Enter the value in chat! (Enter cancel if you want to cancel it.)");
@@ -159,6 +173,13 @@ public class Listeners implements Listener {
         }
         gui.messageEvent(event.getMessage());
         event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onWorldChange(PlayerChangedWorldEvent event) {
+        for (NPC npc : Main.instance.npcs) {
+            npc.addNPCPacket(event.getPlayer());
+        }
     }
 
     private void injectPlayer(Player player) {

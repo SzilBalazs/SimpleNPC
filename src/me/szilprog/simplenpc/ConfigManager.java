@@ -35,11 +35,13 @@ public class ConfigManager {
     }
     public static void loadNPCConfig(List<String> names) throws IOException {
         for (String name : names) {
+            name = name.toLowerCase();
             loadNPCConfig(name);
         }
     }
 
     public static void loadNPCConfig(String name) throws IOException {
+            name = name.toLowerCase();
             Main.instance.getLogger().info("Loading {name} npc.".replace("{name}", name));
             File npcdata = new File(Main.instance.getDataFolder(), name+".yml");
             FileConfiguration c=YamlConfiguration.loadConfiguration(npcdata);
@@ -50,6 +52,7 @@ public class ConfigManager {
             c.addDefault("npc.loc.z", 0);
             c.addDefault("npc.loc.yaw", 0);
             c.addDefault("npc.loc.pitch", 0);
+            c.addDefault("npc.loc.world", 0);
             c.addDefault("npc.command", "say hi {PlayerName}");
             c.addDefault("npc.cooldown", 3);
             c.addDefault("npc.permission.permission", "Disabled");
@@ -58,8 +61,7 @@ public class ConfigManager {
             c.addDefault("npc.look.radius", -1);
             c.options().copyDefaults(true);
             c.save(npcdata);
-
-        Main.instance.npcs.add(new NPC(new Location(Bukkit.getWorlds().get(0), c.getInt("npc.loc.x"), c.getInt("npc.loc.y"), c.getInt("npc.loc.z"), c.getInt("npc.loc.yaw"), c.getInt("npc.loc.pitch")), c.getString("npc.name"), c.getString("npc.skinname"), c.getString("npc.command"), c.getInt("npc.cooldown"), c.getString("npc.permission.permission"), c.getString("npc.permission.message"), c.getBoolean("npc.look.lookPlayer"), c.getInt("npc.look.radius"), name));
+            Main.instance.npcs.add(new NPC(new Location(Bukkit.getWorlds().get(c.getInt("npc.loc.world")), c.getInt("npc.loc.x"), c.getInt("npc.loc.y"), c.getInt("npc.loc.z"), c.getInt("npc.loc.yaw"), c.getInt("npc.loc.pitch")), c.getString("npc.name"), c.getString("npc.skinname"), c.getString("npc.command"), c.getInt("npc.cooldown"), c.getString("npc.permission.permission"), c.getString("npc.permission.message"), c.getBoolean("npc.look.lookPlayer"), c.getInt("npc.look.radius"), name));
     }
 
     public static void loadNPCConfig(String name, Location location) throws IOException {
@@ -73,6 +75,7 @@ public class ConfigManager {
         c.addDefault("npc.loc.z", location.getZ());
         c.addDefault("npc.loc.yaw", location.getYaw());
         c.addDefault("npc.loc.pitch", location.getPitch());
+        c.addDefault("npc.loc.world", Bukkit.getWorlds().indexOf(location.getWorld()));
         c.addDefault("npc.command", "say hi {PlayerName}");
         c.addDefault("npc.cooldown", 3);
         c.addDefault("npc.permission.permission", "Disabled");
@@ -82,7 +85,7 @@ public class ConfigManager {
         c.options().copyDefaults(true);
         c.save(npcdata);
 
-        Main.instance.npcs.add(new NPC(new Location(Bukkit.getWorlds().get(0), c.getInt("npc.loc.x"), c.getInt("npc.loc.y"), c.getInt("npc.loc.z"), c.getInt("npc.loc.yaw"), c.getInt("npc.loc.pitch")), c.getString("npc.name"), c.getString("npc.skinname"), c.getString("npc.command"), c.getInt("npc.cooldown"), c.getString("npc.permission.permission"), c.getString("npc.permission.message"), c.getBoolean("npc.look.lookPlayer"), c.getInt("npc.look.radius"), name));
+        Main.instance.npcs.add(new NPC(location, c.getString("npc.name"), c.getString("npc.skinname"), c.getString("npc.command"), c.getInt("npc.cooldown"), c.getString("npc.permission.permission"), c.getString("npc.permission.message"), c.getBoolean("npc.look.lookPlayer"), c.getInt("npc.look.radius"), name));
     }
 
     public static FileConfiguration getNPCConfig(String name) {
