@@ -100,7 +100,6 @@ public class NPC {
     public void removeNPCPacket(Player player) {
         PlayerConnection connection = ((CraftPlayer)player).getHandle().playerConnection;
         connection.sendPacket(new PacketPlayOutEntityDestroy(npc.getId()));
-        player.sendMessage(this.getName());
     }
 
     private static String[] getSkin(String name ) {
