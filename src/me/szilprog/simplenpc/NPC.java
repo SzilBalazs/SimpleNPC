@@ -73,6 +73,8 @@ public class NPC {
         }
         npc = new EntityPlayer(nmsServer, nmsWorld, gameProfile, new PlayerInteractManager(nmsWorld));
         moveNPC(loc.getX(), loc.getY(), loc.getZ());
+        if (Bukkit.getPlayer(npc.getUniqueID()) != null)
+            Bukkit.getPlayer(npc.getUniqueID()).setPlayerListName("");
     }
 
     public void sendLookPlayer(Player player) {
@@ -98,6 +100,7 @@ public class NPC {
     public void removeNPCPacket(Player player) {
         PlayerConnection connection = ((CraftPlayer)player).getHandle().playerConnection;
         connection.sendPacket(new PacketPlayOutEntityDestroy(npc.getId()));
+        player.sendMessage(this.getName());
     }
 
     private static String[] getSkin(String name ) {

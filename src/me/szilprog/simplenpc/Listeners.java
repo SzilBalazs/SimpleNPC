@@ -175,6 +175,7 @@ public class Listeners implements Listener {
     @EventHandler
     public void onWorldChange(PlayerChangedWorldEvent event) {
         for (NPC npc : Main.instance.npcs) {
+            npc.removeNPCPacket(event.getPlayer());
             if (npc.getLocation().getWorld().toString().equals(event.getPlayer().getLocation().getWorld().toString())) npc.addNPCPacket(event.getPlayer());
         }
     }
