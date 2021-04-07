@@ -188,4 +188,6 @@ public class NPC {
     public String getName() { return name; }
 
     public String getId() {return npcId; }
+
+    public Location getLocation() {return loc; }
 }

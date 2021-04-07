@@ -17,7 +17,7 @@ import java.util.List;
 
 public class Main extends JavaPlugin {
 
-    public static final int VERSION=6;
+    public static final int VERSION=7;
     public static Main instance;
     List<NPC> npcs = new ArrayList<>();
 
@@ -35,7 +35,7 @@ public class Main extends JavaPlugin {
         Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Simple NPC Enabled!");
         for (Player p : Bukkit.getOnlinePlayers()) {
             for (NPC npc : npcs) {
-                npc.addNPCPacket(p);
+                if (npc.getLocation().getWorld().toString().equals(p.getLocation().getWorld().toString())) npc.addNPCPacket(p);
             }
         }
         new BukkitRunnable() {
@@ -120,8 +120,8 @@ public class Main extends JavaPlugin {
                         e.printStackTrace();
                     }
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        for (NPC npc : npcs) {
-                            npc.addNPCPacket(p);
+                        for (NPC npc : Main.instance.npcs) {
+                            if (npc.getLocation().getWorld().toString().equals(p.getLocation().getWorld().toString())) npc.addNPCPacket(p);
                         }
                     }
                     Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Simple NPC Reloaded!");

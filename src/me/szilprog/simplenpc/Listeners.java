@@ -27,7 +27,7 @@ public class Listeners implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
         for (NPC npc : Main.instance.npcs) {
-            npc.addNPCPacket(e.getPlayer());
+            if (npc.getLocation().getWorld().toString().equals(e.getPlayer().getLocation().getWorld().toString())) npc.addNPCPacket(e.getPlayer());
         }
     }
 
@@ -119,9 +119,6 @@ public class Listeners implements Listener {
         else if (event.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.RED + "Reload NPCs")) {
             event.setCancelled(true);
             NPCEditGUI gui=NPCEditGUI.playerData.get((event.getWhoClicked().getUniqueId()));
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                gui.npc.removeNPCPacket(p);
-            }
 
             for (Player p : Bukkit.getOnlinePlayers()) {
                 for (NPC npc : Main.instance.npcs) {
@@ -136,7 +133,7 @@ public class Listeners implements Listener {
             }
             for (Player p : Bukkit.getOnlinePlayers()) {
                 for (NPC npc : Main.instance.npcs) {
-                    npc.addNPCPacket(p);
+                    if (npc.getLocation().getWorld().toString().equals(p.getLocation().getWorld().toString())) npc.addNPCPacket(p);
                 }
             }
             Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Simple NPC Reloaded!");
@@ -178,7 +175,7 @@ public class Listeners implements Listener {
     @EventHandler
     public void onWorldChange(PlayerChangedWorldEvent event) {
         for (NPC npc : Main.instance.npcs) {
-            npc.addNPCPacket(event.getPlayer());
+            if (npc.getLocation().getWorld().toString().equals(event.getPlayer().getLocation().getWorld().toString())) npc.addNPCPacket(event.getPlayer());
         }
     }
 
