@@ -18,10 +18,10 @@ public class ConfigManager {
     private static File configFile = null;
 
     public static void loadMainConfig() throws IOException {
-        File skindata = new File(Main.instance.getDataFolder(), "skindata");
+        File skindata = new File(SimpleNPC.instance.getDataFolder(), "skindata");
         if (!skindata.exists()) skindata.mkdirs();
         if (configFile == null) {
-            configFile = new File(Main.instance.getDataFolder(), "npc.yml");
+            configFile = new File(SimpleNPC.instance.getDataFolder(), "npc.yml");
         }
         configuration = YamlConfiguration.loadConfiguration(configFile);
         configuration.addDefault("npc.names", Arrays.asList());
@@ -43,8 +43,8 @@ public class ConfigManager {
 
     public static void loadNPCConfig(String name) throws IOException {
         name = name.toLowerCase();
-        Main.instance.getLogger().info("Loading {name} npc.".replace("{name}", name));
-        File npcdata = new File(Main.instance.getDataFolder(), name + ".yml");
+        SimpleNPC.instance.getLogger().info("Loading {name} npc.".replace("{name}", name));
+        File npcdata = new File(SimpleNPC.instance.getDataFolder(), name + ".yml");
         FileConfiguration c = YamlConfiguration.loadConfiguration(npcdata);
         c.addDefault("npc.name", "&3Simple&2&lNPC");
         c.addDefault("npc.skinname", "Notch");
@@ -63,12 +63,12 @@ public class ConfigManager {
         c.addDefault("npc.look.radius", -1);
         c.options().copyDefaults(true);
         c.save(npcdata);
-        Main.instance.npcs.add(new NPC(new Location(Bukkit.getWorlds().get(c.getInt("npc.loc.world")), c.getInt("npc.loc.x"), c.getInt("npc.loc.y"), c.getInt("npc.loc.z"), c.getInt("npc.loc.yaw"), c.getInt("npc.loc.pitch")), c.getString("npc.name"), c.getString("npc.skinname"), c.getString("npc.command"), c.getInt("npc.cooldown"), new PermissionData(c.getString("npc.permission.use.permission"), c.getString("npc.permission.use.message"), c.getString("npc.permission.see.permission")), c.getBoolean("npc.look.lookPlayer"), c.getInt("npc.look.radius"), name));
+        SimpleNPC.instance.npcs.add(new NPC(new Location(Bukkit.getWorlds().get(c.getInt("npc.loc.world")), c.getInt("npc.loc.x"), c.getInt("npc.loc.y"), c.getInt("npc.loc.z"), c.getInt("npc.loc.yaw"), c.getInt("npc.loc.pitch")), c.getString("npc.name"), c.getString("npc.skinname"), c.getString("npc.command"), c.getInt("npc.cooldown"), new PermissionData(c.getString("npc.permission.use.permission"), c.getString("npc.permission.use.message"), c.getString("npc.permission.see.permission")), c.getBoolean("npc.look.lookPlayer"), c.getInt("npc.look.radius"), name));
     }
 
     public static void loadNPCConfig(String name, Location location) throws IOException {
-        Main.instance.getLogger().info("Loading {name} npc.".replace("{name}", name));
-        File npcdata = new File(Main.instance.getDataFolder(), name + ".yml");
+        SimpleNPC.instance.getLogger().info("Loading {name} npc.".replace("{name}", name));
+        File npcdata = new File(SimpleNPC.instance.getDataFolder(), name + ".yml");
         FileConfiguration c = YamlConfiguration.loadConfiguration(npcdata);
         c.addDefault("npc.name", "&3Simple&2&lNPC");
         c.addDefault("npc.skinname", "Notch");
@@ -87,17 +87,17 @@ public class ConfigManager {
         c.addDefault("npc.look.radius", -1);
         c.options().copyDefaults(true);
         c.save(npcdata);
-        Main.instance.npcs.add(new NPC(new Location(Bukkit.getWorlds().get(c.getInt("npc.loc.world")), c.getInt("npc.loc.x"), c.getInt("npc.loc.y"), c.getInt("npc.loc.z"), c.getInt("npc.loc.yaw"), c.getInt("npc.loc.pitch")), c.getString("npc.name"), c.getString("npc.skinname"), c.getString("npc.command"), c.getInt("npc.cooldown"), new PermissionData(c.getString("npc.permission.use.permission"), c.getString("npc.permission.use.message"), c.getString("npc.permission.see.permission")), c.getBoolean("npc.look.lookPlayer"), c.getInt("npc.look.radius"), name));
+        SimpleNPC.instance.npcs.add(new NPC(new Location(Bukkit.getWorlds().get(c.getInt("npc.loc.world")), c.getInt("npc.loc.x"), c.getInt("npc.loc.y"), c.getInt("npc.loc.z"), c.getInt("npc.loc.yaw"), c.getInt("npc.loc.pitch")), c.getString("npc.name"), c.getString("npc.skinname"), c.getString("npc.command"), c.getInt("npc.cooldown"), new PermissionData(c.getString("npc.permission.use.permission"), c.getString("npc.permission.use.message"), c.getString("npc.permission.see.permission")), c.getBoolean("npc.look.lookPlayer"), c.getInt("npc.look.radius"), name));
     }
 
     public static FileConfiguration getNPCConfig(String name) {
-        File npcdata = new File(Main.instance.getDataFolder(), name + ".yml");
+        File npcdata = new File(SimpleNPC.instance.getDataFolder(), name + ".yml");
         FileConfiguration c = YamlConfiguration.loadConfiguration(npcdata);
         return c;
     }
 
     public static File getConfigFile(String name) {
-        return new File(Main.instance.getDataFolder(), name + ".yml");
+        return new File(SimpleNPC.instance.getDataFolder(), name + ".yml");
     }
 
     public static void checkForUpdates() throws IOException {
@@ -115,10 +115,10 @@ public class ConfigManager {
             Bukkit.getConsoleSender().sendMessage("[Simple NPC] Invalid update check!");
         }
         if (versionNumber != null) {
-            Bukkit.getLogger().info("Version number: {0}".replace("{0}", String.valueOf(Main.VERSION)));
-            if (Main.VERSION < versionNumber) {
+            Bukkit.getLogger().info("Version number: {0}".replace("{0}", String.valueOf(SimpleNPC.VERSION)));
+            if (SimpleNPC.VERSION < versionNumber) {
                 Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Simple NPC] OUT-DATED!");
-                Main.instance.getLogger().info("Please visit https://www.spigotmc.org/resources/simple-npc-easily-create-clickable-npcs-permissions.90893/ to download the latest version.");
+                SimpleNPC.instance.getLogger().info("Please visit https://www.spigotmc.org/resources/simple-npc-easily-create-clickable-npcs-permissions.90893/ to download the latest version.");
             } else {
                 Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[Simple NPC] UP-TO-DATE!");
             }
@@ -142,8 +142,8 @@ public class ConfigManager {
     }
 
     public static void deleteNPC(String name) {
-        Main.instance.getLogger().info("Deleting {name} npc.".replace("{name}", name));
-        File npcdata = new File(Main.instance.getDataFolder(), name + ".yml");
+        SimpleNPC.instance.getLogger().info("Deleting {name} npc.".replace("{name}", name));
+        File npcdata = new File(SimpleNPC.instance.getDataFolder(), name + ".yml");
 
         try {
             List<String> list = configuration.getStringList("npc.names");

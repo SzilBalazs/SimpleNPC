@@ -28,7 +28,7 @@ public class Listeners implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
-        for (NPC npc : Main.instance.npcs) {
+        for (NPC npc : SimpleNPC.instance.npcs) {
             if (npc.getLocation().getWorld().toString().equals(e.getPlayer().getLocation().getWorld().toString()))
                 npc.addNPCPacket(e.getPlayer());
         }
@@ -119,18 +119,18 @@ public class Listeners implements Listener {
             NPCEditGUI gui = NPCEditGUI.playerData.get((event.getWhoClicked().getUniqueId()));
 
             for (Player p : Bukkit.getOnlinePlayers()) {
-                for (NPC npc : Main.instance.npcs) {
+                for (NPC npc : SimpleNPC.instance.npcs) {
                     npc.removeNPCPacket(p);
                 }
             }
-            Main.instance.npcs.clear();
+            SimpleNPC.instance.npcs.clear();
             try {
                 ConfigManager.loadMainConfig();
             } catch (IOException e) {
                 e.printStackTrace();
             }
             for (Player p : Bukkit.getOnlinePlayers()) {
-                for (NPC npc : Main.instance.npcs) {
+                for (NPC npc : SimpleNPC.instance.npcs) {
                     if (npc.getLocation().getWorld().toString().equals(p.getLocation().getWorld().toString()))
                         npc.addNPCPacket(p);
                 }
@@ -145,7 +145,7 @@ public class Listeners implements Listener {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "npc delete {0}".replace("{0}", NPCEditGUI.playerData.get((event.getWhoClicked().getUniqueId())).npc.getId()));
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "npc reload");
                 }
-            }.runTask(Main.instance);
+            }.runTask(SimpleNPC.instance);
             event.setCancelled(true);
             return;
         } else if (event.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.RED + "Teleport here NPC")) {
@@ -185,7 +185,7 @@ public class Listeners implements Listener {
 
     @EventHandler
     public void onWorldChange(PlayerChangedWorldEvent event) {
-        for (NPC npc : Main.instance.npcs) {
+        for (NPC npc : SimpleNPC.instance.npcs) {
             npc.removeNPCPacket(event.getPlayer());
             if (npc.getLocation().getWorld().toString().equals(event.getPlayer().getLocation().getWorld().toString()))
                 npc.addNPCPacket(event.getPlayer());
@@ -201,7 +201,7 @@ public class Listeners implements Listener {
                     packet = (PacketPlayInUseEntity) packet;
                     Field f = packet.getClass().getDeclaredField("a");
                     f.setAccessible(true);
-                    for (NPC npc : Main.instance.npcs) {
+                    for (NPC npc : SimpleNPC.instance.npcs) {
                         if (npc.getEntityPlayer().getId() == f.getInt(packet)) {
                             npc.interactEvent((PacketPlayInUseEntity) packet, player);
                         }
