@@ -8,7 +8,6 @@ import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
@@ -24,28 +23,26 @@ import java.util.concurrent.ExecutionException;
 
 public class NPC {
 
-    private EntityPlayer npc=null;
+    private EntityPlayer npc = null;
     private String name;
     private String skin;
     private Location loc;
     private String command;
-    private HashMap<UUID, Integer> cooldownManager= new HashMap<UUID, Integer>();
+    private HashMap<UUID, Integer> cooldownManager = new HashMap<UUID, Integer>();
     private int cooldown;
-    private String permission;
-    private String permissionMessage;
+    private PermissionData permission;
     private boolean lookClose;
     private int radius;
     private final String npcId;
     public static Plugin plugin;
 
-    public NPC(Location loc, String name, String skinUsername, String command, int cooldown, String permission, String permissionMessage, boolean lookClose, int radius, String npcid) {
+    public NPC(Location loc, String name, String skinUsername, String command, int cooldown, PermissionData permission, boolean lookClose, int radius, String npcid) {
         this.name = name;
         this.loc = loc;
         this.skin = skinUsername;
         this.command = command;
         this.cooldown = cooldown;
         this.permission = permission;
-        this.permissionMessage = permissionMessage;
         this.lookClose = lookClose;
         this.radius = radius;
         this.npcId = npcid;
@@ -59,13 +56,12 @@ public class NPC {
 
     public void createNPC() {
         MinecraftServer nmsServer = ((CraftServer) Bukkit.getServer()).getServer();
-        WorldServer nmsWorld = ((CraftWorld)loc.getWorld()).getHandle();
+        WorldServer nmsWorld = ((CraftWorld) loc.getWorld()).getHandle();
         GameProfile gameProfile = new GameProfile(UUID.randomUUID(), coloredNameUtil(name));
-        String[] name=null;
+        String[] name = null;
         try {
             name = getSkin(skin);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "INVALID SKIN USERNAME");
         }
         if (name != null) {
@@ -91,18 +87,21 @@ public class NPC {
 
     public void addNPCPacket(Player player) {
         if (npc == null) return;
-        PlayerConnection connection = ((CraftPlayer)player).getHandle().playerConnection;
+        if (!player.hasPermission(permission.seePermission) && !permission.seePermission.equalsIgnoreCase("disabled")) {
+            return;
+        }
+        PlayerConnection connection = ((CraftPlayer) player).getHandle().playerConnection;
         connection.sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, npc));
         connection.sendPacket(new PacketPlayOutNamedEntitySpawn(npc));
         connection.sendPacket(new PacketPlayOutEntityHeadRotation(npc, (byte) (npc.yaw * 256 / 360)));
     }
 
     public void removeNPCPacket(Player player) {
-        PlayerConnection connection = ((CraftPlayer)player).getHandle().playerConnection;
+        PlayerConnection connection = ((CraftPlayer) player).getHandle().playerConnection;
         connection.sendPacket(new PacketPlayOutEntityDestroy(npc.getId()));
     }
 
-    private static String[] getSkin(String name ) {
+    private static String[] getSkin(String name) {
         try {
             URL url = new URL("https://api.mojang.com/users/profiles/minecraft/" + name);
             InputStreamReader reader = new InputStreamReader(url.openStream());
@@ -113,19 +112,18 @@ public class NPC {
             JsonObject property = new JsonParser().parse(reader2).getAsJsonObject().get("properties").getAsJsonArray().get(0).getAsJsonObject();
             String texture = property.get("value").getAsString();
             String signature = property.get("signature").getAsString();
-            return new String[] {texture, signature};
-        }
-        catch (Exception e) {
+            return new String[]{texture, signature};
+        } catch (Exception e) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "INVALID SKIN USERNAME");
             return null;
         }
     }
 
-    public void moveNPC (double x, double y, double z) {
+    public void moveNPC(double x, double y, double z) {
         npc.setLocation(x, y, z, loc.getYaw(), loc.getPitch());
         loc = new Location(loc.getWorld(), x, y, z, loc.getYaw(), loc.getPitch());
         for (Player p : Bukkit.getOnlinePlayers()) {
-            ((CraftPlayer)p).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityTeleport(npc));
+            ((CraftPlayer) p).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityTeleport(npc));
         }
     }
 
@@ -142,24 +140,23 @@ public class NPC {
         if (cooldownManager.containsKey(player.getUniqueId())) {
             if (cooldownManager.get(player.getUniqueId()) > 0) {
                 return;
-            }
-            else {
+            } else {
                 cooldownManager.replace(player.getUniqueId(), cooldown);
             }
-        }
-        else {
+        } else {
             cooldownManager.put(player.getUniqueId(), cooldown);
         }
-        if (!permission.equalsIgnoreCase("disabled") && !player.hasPermission(permission)) {
-            player.sendMessage(coloredNameUtil(permissionMessage));
+        if (!permission.usePermission.equalsIgnoreCase("disabled") && !player.hasPermission(permission.usePermission)) {
+            player.sendMessage(coloredNameUtil(permission.useMessage));
             return;
         }
         final String[] formatedCmd = {command.replace("{PlayerName}", player.getName())};
         new BukkitRunnable() {
-            private String cmd=formatedCmd[0];
+            private String cmd = formatedCmd[0];
+
             @Override
             public void run() {
-                Bukkit.dispatchCommand( Bukkit.getConsoleSender(), cmd);
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
             }
         }.runTask(Main.instance);
 
@@ -172,7 +169,7 @@ public class NPC {
     public void cooldownUpdate() {
         for (UUID uuid : cooldownManager.keySet()) {
             if (cooldownManager.get(uuid) > 0) {
-                cooldownManager.replace(uuid, cooldownManager.get(uuid)-1);
+                cooldownManager.replace(uuid, cooldownManager.get(uuid) - 1);
             }
         }
     }
@@ -180,16 +177,24 @@ public class NPC {
     public void lookNPCPacket(Player player, float yaw, float pitch) {
         loc.setYaw(yaw);
         loc.setPitch(pitch);
-        PlayerConnection connection = ((CraftPlayer)player).getHandle().playerConnection;
-        connection.sendPacket(new PacketPlayOutEntityHeadRotation(npc, (byte)(yaw * 256 / 360)));
-        connection.sendPacket(new PacketPlayOutEntity.PacketPlayOutEntityLook(npc.getId(), (byte)(yaw * 256 / 360), (byte)(pitch * 256 / 360), true));
+        PlayerConnection connection = ((CraftPlayer) player).getHandle().playerConnection;
+        connection.sendPacket(new PacketPlayOutEntityHeadRotation(npc, (byte) (yaw * 256 / 360)));
+        connection.sendPacket(new PacketPlayOutEntity.PacketPlayOutEntityLook(npc.getId(), (byte) (yaw * 256 / 360), (byte) (pitch * 256 / 360), true));
     }
 
-    public boolean isLookClose() { return lookClose; }
+    public boolean isLookClose() {
+        return lookClose;
+    }
 
-    public String getName() { return name; }
+    public String getName() {
+        return name;
+    }
 
-    public String getId() {return npcId; }
+    public String getId() {
+        return npcId;
+    }
 
-    public Location getLocation() {return loc; }
+    public Location getLocation() {
+        return loc;
+    }
 }

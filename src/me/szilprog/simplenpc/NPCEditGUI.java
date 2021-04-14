@@ -24,7 +24,7 @@ public class NPCEditGUI implements Listener {
     public Player player;
     public FileConfiguration config;
     public static HashMap<UUID, NPCEditGUI> playerData = new HashMap<UUID, NPCEditGUI>();
-    public WaitingMessageType waitingMessage=WaitingMessageType.NONE;
+    public WaitingMessageType waitingMessage = WaitingMessageType.NONE;
 
     public NPCEditGUI(Player player, NPC npc) {
         this.npc = npc;
@@ -37,30 +37,32 @@ public class NPCEditGUI implements Listener {
 
     }
 
-    public Inventory getInventory() { return inv; }
+    public Inventory getInventory() {
+        return inv;
+    }
 
     public ItemStack getItem(int index) {
-        ItemStack itemStack=null;
+        ItemStack itemStack = null;
         switch (index) {
             case 0:
                 itemStack = new ItemStack(Material.PAPER);
                 ItemMeta meta = itemStack.getItemMeta();
                 meta.setDisplayName(ChatColor.RED + "NPC Display Name");
-                meta.setLore(Arrays.asList(ChatColor.GRAY + "Click here to edit the NPC's display name!", ChatColor.GRAY + "Display name of your NPC", ChatColor.RED + "Maximum 16 characters!", ChatColor.GREEN+"Current is " + config.getString("npc.name")));
+                meta.setLore(Arrays.asList(ChatColor.GRAY + "Click here to edit the NPC's display name!", ChatColor.GRAY + "Display name of your NPC", ChatColor.RED + "Maximum 16 characters!", ChatColor.GREEN + "Current is " + NPC.coloredNameUtil(config.getString("npc.name"))));
                 itemStack.setItemMeta(meta);
                 break;
             case 1:
                 itemStack = new ItemStack(Material.PAPER);
                 meta = itemStack.getItemMeta();
                 meta.setDisplayName(ChatColor.RED + "NPC Skin Name");
-                meta.setLore(Arrays.asList(ChatColor.GRAY + "Click here to edit the NPC's skin name!", ChatColor.GRAY + "The skin's owner.", ChatColor.GREEN+"Current is " + config.getString("npc.skinname")));
+                meta.setLore(Arrays.asList(ChatColor.GRAY + "Click here to edit the NPC's skin name!", ChatColor.GRAY + "The skin's owner.", ChatColor.GREEN + "Current is " + config.getString("npc.skinname")));
                 itemStack.setItemMeta(meta);
                 break;
             case 2:
                 itemStack = new ItemStack(Material.PAPER);
                 meta = itemStack.getItemMeta();
                 meta.setDisplayName(ChatColor.RED + "NPC Command");
-                meta.setLore(Arrays.asList(ChatColor.GRAY + "Click here to edit the NPC's command!", ChatColor.GRAY + "The command that the NPC runs.", ChatColor.GREEN+"Current is " + config.getString("npc.command")));
+                meta.setLore(Arrays.asList(ChatColor.GRAY + "Click here to edit the NPC's command!", ChatColor.GRAY + "The command that the NPC runs.", ChatColor.GREEN + "Current is " + config.getString("npc.command")));
                 itemStack.setItemMeta(meta);
                 break;
             case 3:
@@ -74,14 +76,14 @@ public class NPCEditGUI implements Listener {
                 itemStack = new ItemStack(Material.PAPER);
                 meta = itemStack.getItemMeta();
                 meta.setDisplayName(ChatColor.RED + "NPC Permission");
-                meta.setLore(Arrays.asList(ChatColor.GRAY + "Click here to edit the NPC's permission!", ChatColor.GRAY + "Right click to " + ChatColor.RED + "disable " + ChatColor.GRAY +  "this feature", ChatColor.GRAY + "Permission needed to use the NPC.", ChatColor.GREEN + "Current is " + config.getString("npc.permission.permission")));
+                meta.setLore(Arrays.asList(ChatColor.GRAY + "Click here to edit the NPC's permission!", ChatColor.GRAY + "Right click to " + ChatColor.RED + "disable " + ChatColor.GRAY + "this feature", ChatColor.GRAY + "Permission needed to use the NPC.", ChatColor.GREEN + "Current is " + config.getString("npc.permission.use.permission")));
                 itemStack.setItemMeta(meta);
                 break;
             case 5:
                 itemStack = new ItemStack(Material.PAPER);
                 meta = itemStack.getItemMeta();
                 meta.setDisplayName(ChatColor.RED + "NPC Permission Message");
-                meta.setLore(Arrays.asList(ChatColor.GRAY + "Click here to edit the NPC's permission message!", ChatColor.GRAY + "The permission message.", ChatColor.GREEN + "Current is " + config.getString("npc.permission.message")));
+                meta.setLore(Arrays.asList(ChatColor.GRAY + "Click here to edit the NPC's permission message!", ChatColor.GRAY + "The permission message.", ChatColor.GREEN + "Current is " + NPC.coloredNameUtil(config.getString("npc.permission.use.message"))));
                 itemStack.setItemMeta(meta);
                 break;
             case 6:
@@ -93,7 +95,7 @@ public class NPCEditGUI implements Listener {
                 meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 
                 meta.setDisplayName(ChatColor.RED + "NPC Look Player");
-                meta.setLore(Arrays.asList(ChatColor.GRAY + "Click here to set the NPC's look player value to " + !config.getBoolean("npc.look.lookPlayer") +  "!", ChatColor.GRAY + "This will make the NPC always look the player."));
+                meta.setLore(Arrays.asList(ChatColor.GRAY + "Click here to set the NPC's look player value to " + !config.getBoolean("npc.look.lookPlayer") + "!", ChatColor.GRAY + "This will make the NPC always look the player."));
                 itemStack.setItemMeta(meta);
                 break;
         }
@@ -101,15 +103,21 @@ public class NPCEditGUI implements Listener {
     }
 
     public void createInventory() {
-        inv=Bukkit.createInventory(null, 27, ChatColor.DARK_GREEN + "Editing " + npc.getId());
-        for (int i=10;i<19;i++) {
-            ItemStack itemStack = getItem(i-10);
+        inv = Bukkit.createInventory(null, 27, ChatColor.DARK_GREEN + "Editing " + npc.getId());
+        for (int i = 10; i < 19; i++) {
+            ItemStack itemStack = getItem(i - 10);
             if (itemStack != null) {
                 inv.setItem(i, itemStack);
             }
         }
-        ItemStack itemStack = new ItemStack(Material.RED_CONCRETE);
+        ItemStack itemStack = new ItemStack(Material.BLUE_CONCRETE);
         ItemMeta meta = itemStack.getItemMeta();
+        meta.setDisplayName(ChatColor.RED + "Teleport here NPC");
+        meta.setLore(Arrays.asList(ChatColor.GRAY + "Click here to teleport here this NPC!"));
+        itemStack.setItemMeta(meta);
+        inv.setItem(24, itemStack);
+        itemStack = new ItemStack(Material.RED_CONCRETE);
+        meta = itemStack.getItemMeta();
         meta.setDisplayName(ChatColor.RED + "Delete NPC");
         meta.setLore(Arrays.asList(ChatColor.GRAY + "Click here to delete this NPC!"));
         itemStack.setItemMeta(meta);
@@ -153,16 +161,15 @@ public class NPCEditGUI implements Listener {
                     case COOLDOWN:
                         try {
                             config.set("npc.cooldown", Integer.parseInt(message));
-                        }
-                        catch (Exception e) {
+                        } catch (Exception e) {
                             player.sendMessage(ChatColor.RED + "Please enter a valid number!");
                         }
                         break;
                     case PERMISSION:
-                        config.set("npc.permission.permission", message);
+                        config.set("npc.permission.use.permission", message);
                         break;
                     case PMESSAGE:
-                        config.set("npc.permission.message", message);
+                        config.set("npc.permission.use.message", message);
                         break;
 
                 }
@@ -173,7 +180,7 @@ public class NPCEditGUI implements Listener {
                 } catch (IOException e) {
 
                 }
-                waitingMessage=WaitingMessageType.NONE;
+                waitingMessage = WaitingMessageType.NONE;
             }
         }.runTask(Main.instance);
 
