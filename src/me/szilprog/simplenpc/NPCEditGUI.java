@@ -137,7 +137,7 @@ public class NPCEditGUI implements Listener {
                 createInventory();
                 player.openInventory(inv);
             }
-        }.runTask(Main.instance);
+        }.runTask(SimpleNPC.instance);
 
     }
 
@@ -182,7 +182,7 @@ public class NPCEditGUI implements Listener {
                 }
                 waitingMessage = WaitingMessageType.NONE;
             }
-        }.runTask(Main.instance);
+        }.runTask(SimpleNPC.instance);
 
     }
 }

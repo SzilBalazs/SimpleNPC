@@ -158,7 +158,7 @@ public class NPC {
             public void run() {
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
             }
-        }.runTask(Main.instance);
+        }.runTask(SimpleNPC.instance);
 
     }
 

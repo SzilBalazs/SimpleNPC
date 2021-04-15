@@ -12,10 +12,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Main extends JavaPlugin {
+public class SimpleNPC extends JavaPlugin {
 
     public static final int VERSION = 9;
-    public static Main instance;
+    public static SimpleNPC instance;
     List<NPC> npcs = new ArrayList<>();
 
     @Override
@@ -115,7 +115,7 @@ public class Main extends JavaPlugin {
                         e.printStackTrace();
                     }
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        for (NPC npc : Main.instance.npcs) {
+                        for (NPC npc : SimpleNPC.instance.npcs) {
                             if (npc.getLocation().getWorld().toString().equals(p.getLocation().getWorld().toString()))
                                 npc.addNPCPacket(p);
                         }
