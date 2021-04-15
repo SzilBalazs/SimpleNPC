@@ -1,6 +1,6 @@
 name: SimpleNPC
 version: 2.6.2
-main: me.szilprog.simplenpc.Main
+main: me.szilprog.simplenpc.SimpleNPC
 api-version: 1.16
 commands:
   npc:
