@@ -1,4 +1,4 @@
-package me.szilprog.simplenpc;
+package me.szilprog.simplenpc.utils;
 
 public class PermissionData {
     public String usePermission;
