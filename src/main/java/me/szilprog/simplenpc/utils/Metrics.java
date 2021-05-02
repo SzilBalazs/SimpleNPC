@@ -1,4 +1,4 @@
-package me.szilprog.simplenpc;
+package me.szilprog.simplenpc.utils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;

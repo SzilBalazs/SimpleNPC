@@ -1,9 +1,11 @@
-package me.szilprog.simplenpc;
+package me.szilprog.simplenpc.npc;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import me.szilprog.simplenpc.SimpleNPC;
+import me.szilprog.simplenpc.utils.PermissionData;
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -158,7 +160,7 @@ public class NPC {
             public void run() {
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
             }
-        }.runTask(SimpleNPC.instance);
+        }.runTask(SimpleNPC.getInstance());
 
     }
 

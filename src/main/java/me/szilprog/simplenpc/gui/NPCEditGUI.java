@@ -1,5 +1,9 @@
-package me.szilprog.simplenpc;
+package me.szilprog.simplenpc.gui;
 
+import me.szilprog.simplenpc.npc.NPC;
+import me.szilprog.simplenpc.SimpleNPC;
+import me.szilprog.simplenpc.utils.ConfigManager;
+import me.szilprog.simplenpc.utils.WaitingMessageType;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -18,7 +22,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.UUID;
 
-public class NPCEditGUI implements Listener {
+public class  NPCEditGUI implements Listener {
     public Inventory inv;
     public NPC npc;
     public Player player;
@@ -137,7 +141,7 @@ public class NPCEditGUI implements Listener {
                 createInventory();
                 player.openInventory(inv);
             }
-        }.runTask(SimpleNPC.instance);
+        }.runTask(SimpleNPC.getInstance());
 
     }
 
@@ -182,7 +186,7 @@ public class NPCEditGUI implements Listener {
                 }
                 waitingMessage = WaitingMessageType.NONE;
             }
-        }.runTask(SimpleNPC.instance);
+        }.runTask(SimpleNPC.getInstance());
 
     }
 }
